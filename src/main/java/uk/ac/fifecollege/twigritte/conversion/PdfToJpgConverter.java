@@ -19,7 +19,7 @@ public class PdfToJpgConverter implements FileConverter {
     @Override
     public File convert(File file) throws IOException {
         String originalFileName = file.getName();
-        String baseFileName = originalFileName.substring(originalFileName.length() - PDF_EXTENSION.length());
+        String baseFileName = originalFileName.substring(0, originalFileName.length() - PDF_EXTENSION.length());
 
         try (PDDocument document = PDDocument.load(file)) {
             PDFRenderer renderer = new PDFRenderer(document);
@@ -32,8 +32,10 @@ public class PdfToJpgConverter implements FileConverter {
                 }
 
                 int page = 0; // just convert the first page
+                LOG.info("Rendering PDF as image (JPG), this may take awhile...");
                 BufferedImage bufferedImage = renderer.renderImage(page);
                 File outputFile = new File(file.getParentFile(), baseFileName + "-converted-" + page + ".jpg");
+                LOG.debug("Converted file: " + outputFile.toString());
                 ImageIO.write(bufferedImage, "jpg", outputFile);
                 return outputFile;
             }
