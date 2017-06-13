@@ -1,4 +1,6 @@
 twitter4j.properties
+test-files/
+twitter/
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Maven template
