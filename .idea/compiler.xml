@@ -12,7 +12,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="tweetdir" target="1.5" />
-      <module name="twigritte" target="1.5" />
+      <module name="twigritte" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
