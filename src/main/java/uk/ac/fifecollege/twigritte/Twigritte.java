@@ -75,12 +75,13 @@ public class Twigritte {
 
     private void handleTweet(File tweetFile, File imageFile) {
         LOG.debug("Handling tweet");
-
+        File targetImage = imageFile;
         FileConverter imageConverter = configuration.getImageConverter();
+
         if (imageConverter != null) {
             try {
                 LOG.debug("Converting image");
-                imageFile = imageConverter.convert(imageFile);
+                targetImage = imageConverter.convert(imageFile);
             } catch (IOException e) {
                 LOG.error("Error during image conversion", e);
                 return;
@@ -98,7 +99,7 @@ public class Twigritte {
 
         Twitter twitter = TwitterFactory.getSingleton();
         StatusUpdate statusUpdate = new StatusUpdate(tweetText);
-        statusUpdate.setMedia(imageFile);
+        statusUpdate.setMedia(targetImage);
 
         try {
             LOG.info("Posting tweet to account: " + twitter.getScreenName());
@@ -109,6 +110,20 @@ public class Twigritte {
             LOG.error("Error whilst posting tweet", e);
             return;
         }
+
+        LOG.info("Cleaning up job files");
+        boolean tweetFileDeleted = tweetFile.delete();
+        boolean imageFileDeleted = imageFile.delete();
+        boolean convertedFileDeleted = false;
+
+        // is converted image
+        if (!targetImage.equals(imageFile)) {
+             convertedFileDeleted = targetImage.delete();
+        }
+
+        LOG.debug("Tweet file deleted: " + tweetFileDeleted);
+        LOG.debug("Image file deleted: " + imageFileDeleted);
+        LOG.debug("Converted file deleted: " + convertedFileDeleted);
     }
 
     private static String loadAsString(File tweetFile) throws IOException {
