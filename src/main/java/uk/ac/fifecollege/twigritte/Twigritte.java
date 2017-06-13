@@ -91,7 +91,7 @@ public class Twigritte {
         String tweetText;
 
         try {
-            tweetText = loadAsString(tweetFile);
+            tweetText = getTweetText(loadAsString(tweetFile));
         } catch (IOException e) {
             LOG.error("Unable to load tweet text", e);
             return;
@@ -124,6 +124,18 @@ public class Twigritte {
         LOG.debug("Tweet file deleted: " + tweetFileDeleted);
         LOG.debug("Image file deleted: " + imageFileDeleted);
         LOG.debug("Converted file deleted: " + convertedFileDeleted);
+    }
+
+    private String getTweetText(String rawTweetText) {
+        String tweetText = rawTweetText;
+
+        if (!configuration.shouldKeepKyoTag()) {
+            tweetText = tweetText.replace("#kyocera", "")
+                    .replace("#kyocodes", "")
+                    .trim();
+        }
+
+        return tweetText;
     }
 
     private static String loadAsString(File tweetFile) throws IOException {

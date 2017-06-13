@@ -56,7 +56,7 @@ public class Configuration {
         this.imageConverter = imageConverter;
     }
 
-    public boolean isKeepKyoTag() {
+    public boolean shouldKeepKyoTag() {
         return keepKyoTag;
     }
 

@@ -21,7 +21,7 @@ public class Launcher {
                 .withTweetFileFilter(TWEET_FILE_FILTER)
                 .withImageFileFilter(IMAGE_FILE_FILTER)
                 .withImageConverter(new PdfToJpgConverter())
-                .removeKyoTag()
+                .removeKyoTag() // TODO remove this for competition
                 .build();
 
         Twigritte twigritte = new Twigritte(configuration);
