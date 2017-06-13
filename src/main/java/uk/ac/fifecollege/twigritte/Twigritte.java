@@ -49,7 +49,7 @@ public class Twigritte {
                         }
                     });
 
-            LOG.info("Ready for next job!");
+            LOG.info("Ready for job!");
             tweetComponentsFuture = CompletableFuture.allOf(tweetFileFuture, imageFileFuture);
 
             try {
