@@ -17,7 +17,7 @@ public class Launcher {
         System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
         Configuration configuration = ConfigurationBuilder.newBuilder()
-                .withWatchDirectory(new File("twitter"))
+                .withWatchDirectory(new File("twitter_jobs"))
                 .withTweetFileFilter(TWEET_FILE_FILTER)
                 .withImageFileFilter(IMAGE_FILE_FILTER)
                 .withImageConverter(new PdfToJpgConverter())
