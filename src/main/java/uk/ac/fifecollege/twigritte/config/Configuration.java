@@ -5,12 +5,9 @@ import uk.ac.fifecollege.twigritte.conversion.FileConverter;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 public class Configuration {
-    protected File pollDirectory = null;
-    protected TimeUnit pollTimeUnit = TimeUnit.SECONDS;
-    protected long pollTime = 5;
+    protected File watchDirectory = null;
     protected FileFilter tweetFileFilter = null;
     protected FileFilter imageFileFilter = null;
     protected FileConverter imageConverter = null;
@@ -18,39 +15,21 @@ public class Configuration {
 
     protected Configuration() {}
 
-    public Configuration(File pollDirectory, TimeUnit pollTimeUnit, long pollTime, FileFilter tweetFileFilter,
-                         FileFilter imageFileFilter, FileConverter imageConverter, boolean keepKyoTag) {
-        this.pollDirectory = pollDirectory;
-        this.pollTimeUnit = pollTimeUnit;
-        this.pollTime = pollTime;
+    public Configuration(File watchDirectory, FileFilter tweetFileFilter, FileFilter imageFileFilter,
+                         FileConverter imageConverter, boolean keepKyoTag) {
+        this.watchDirectory = watchDirectory;
         this.tweetFileFilter = tweetFileFilter;
         this.imageFileFilter = imageFileFilter;
         this.imageConverter = imageConverter;
         this.keepKyoTag = keepKyoTag;
     }
 
-    public File getPollDirectory() {
-        return pollDirectory;
+    public File getWatchDirectory() {
+        return watchDirectory;
     }
 
-    public void setPollDirectory(File pollDirectory) {
-        this.pollDirectory = pollDirectory;
-    }
-
-    public TimeUnit getPollTimeUnit() {
-        return pollTimeUnit;
-    }
-
-    public void setPollTimeUnit(TimeUnit pollTimeUnit) {
-        this.pollTimeUnit = pollTimeUnit;
-    }
-
-    public long getPollTime() {
-        return pollTime;
-    }
-
-    public void setPollTime(long pollTime) {
-        this.pollTime = pollTime;
+    public void setWatchDirectory(File watchDirectory) {
+        this.watchDirectory = watchDirectory;
     }
 
     public FileFilter getTweetFileFilter() {
@@ -90,27 +69,25 @@ public class Configuration {
         if (this == o) return true;
         if (!(o instanceof Configuration)) return false;
         Configuration that = (Configuration) o;
-        return pollTime == that.pollTime &&
-                keepKyoTag == that.keepKyoTag &&
-                Objects.equals(pollDirectory, that.pollDirectory) &&
-                pollTimeUnit == that.pollTimeUnit &&
+        return keepKyoTag == that.keepKyoTag &&
+                Objects.equals(watchDirectory, that.watchDirectory) &&
                 Objects.equals(tweetFileFilter, that.tweetFileFilter) &&
-                Objects.equals(imageFileFilter, that.imageFileFilter);
+                Objects.equals(imageFileFilter, that.imageFileFilter) &&
+                Objects.equals(imageConverter, that.imageConverter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pollDirectory, pollTimeUnit, pollTime, tweetFileFilter, imageFileFilter, keepKyoTag);
+        return Objects.hash(watchDirectory, tweetFileFilter, imageFileFilter, imageConverter, keepKyoTag);
     }
 
     @Override
     public String toString() {
         return "Configuration{" +
-                "pollDirectory=" + pollDirectory +
-                ", pollTimeUnit=" + pollTimeUnit +
-                ", pollTime=" + pollTime +
+                "watchDirectory=" + watchDirectory +
                 ", tweetFileFilter=" + tweetFileFilter +
                 ", imageFileFilter=" + imageFileFilter +
+                ", imageConverter=" + imageConverter +
                 ", keepKyoTag=" + keepKyoTag +
                 '}';
     }

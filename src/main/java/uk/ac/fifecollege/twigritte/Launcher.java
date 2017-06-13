@@ -6,7 +6,6 @@ import uk.ac.fifecollege.twigritte.conversion.PdfToJpgConverter;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.concurrent.TimeUnit;
 
 public class Launcher {
     private static final FileFilter TWEET_FILE_FILTER = file -> file.getName().equalsIgnoreCase("tweet.txt");
@@ -18,8 +17,7 @@ public class Launcher {
         System.setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
 
         Configuration configuration = ConfigurationBuilder.newBuilder()
-                .withPollDirectory(new File("twitter"))
-                .withPollTime(TimeUnit.SECONDS, 5)
+                .withWatchDirectory(new File("twitter"))
                 .withTweetFileFilter(TWEET_FILE_FILTER)
                 .withImageFileFilter(IMAGE_FILE_FILTER)
                 .withImageConverter(new PdfToJpgConverter())
@@ -27,5 +25,6 @@ public class Launcher {
                 .build();
 
         Twigritte twigritte = new Twigritte(configuration);
+        twigritte.start();
     }
 }

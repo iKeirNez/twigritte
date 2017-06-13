@@ -4,7 +4,6 @@ import uk.ac.fifecollege.twigritte.conversion.FileConverter;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.concurrent.TimeUnit;
 
 public class ConfigurationBuilder {
 
@@ -16,7 +15,7 @@ public class ConfigurationBuilder {
 
     private ConfigurationBuilder() {}
 
-    public ConfigurationBuilder withPollDirectory(File directory) {
+    public ConfigurationBuilder withWatchDirectory(File directory) {
         if (!directory.exists()) {
             throw new IllegalArgumentException("Directory does not exist.");
         }
@@ -29,13 +28,7 @@ public class ConfigurationBuilder {
             throw new IllegalArgumentException("Directory is not readable/writable.");
         }
 
-        instance.pollDirectory = directory;
-        return this;
-    }
-
-    public ConfigurationBuilder withPollTime(TimeUnit timeUnit, long time) {
-        instance.pollTimeUnit = timeUnit;
-        instance.pollTime = time;
+        instance.watchDirectory = directory;
         return this;
     }
 
@@ -62,8 +55,8 @@ public class ConfigurationBuilder {
     public Configuration build() {
         // TODO prevent this being called more than once per instance
 
-        if (instance.pollDirectory == null) {
-            throw new NotConfiguredException("pollDirectory");
+        if (instance.watchDirectory == null) {
+            throw new NotConfiguredException("watchDirectory");
         }
 
         if (instance.tweetFileFilter == null) {
