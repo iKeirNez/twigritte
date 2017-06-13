@@ -1,6 +1,6 @@
-package uk.ac.fifecollege.twigritte.config;
+package uk.ac.fife.twigritte.config;
 
-import uk.ac.fifecollege.twigritte.conversion.FileConverter;
+import uk.ac.fife.twigritte.conversion.FileConverter;
 
 import java.io.File;
 import java.io.FileFilter;

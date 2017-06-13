@@ -1,10 +1,10 @@
-package uk.ac.fifecollege.twigritte;
+package uk.ac.fife.twigritte;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import twitter4j.*;
-import uk.ac.fifecollege.twigritte.config.Configuration;
-import uk.ac.fifecollege.twigritte.conversion.FileConverter;
+import uk.ac.fife.twigritte.config.Configuration;
+import uk.ac.fife.twigritte.conversion.FileConverter;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package uk.ac.fifecollege.twigritte.conversion;
+package uk.ac.fife.twigritte.conversion;
 
 import java.io.File;
 import java.io.IOException;

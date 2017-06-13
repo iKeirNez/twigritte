@@ -1,4 +1,4 @@
-package uk.ac.fifecollege.twigritte.conversion;
+package uk.ac.fife.twigritte.conversion;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

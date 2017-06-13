@@ -1,8 +1,8 @@
-package uk.ac.fifecollege.twigritte;
+package uk.ac.fife.twigritte;
 
-import uk.ac.fifecollege.twigritte.config.Configuration;
-import uk.ac.fifecollege.twigritte.config.ConfigurationBuilder;
-import uk.ac.fifecollege.twigritte.conversion.PdfToJpgConverter;
+import uk.ac.fife.twigritte.config.Configuration;
+import uk.ac.fife.twigritte.config.ConfigurationBuilder;
+import uk.ac.fife.twigritte.conversion.PdfToJpgConverter;
 
 import java.io.File;
 import java.io.FileFilter;

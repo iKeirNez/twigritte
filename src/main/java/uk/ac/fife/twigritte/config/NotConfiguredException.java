@@ -1,4 +1,4 @@
-package uk.ac.fifecollege.twigritte.config;
+package uk.ac.fife.twigritte.config;
 
 public class NotConfiguredException extends RuntimeException {
     public NotConfiguredException() {
