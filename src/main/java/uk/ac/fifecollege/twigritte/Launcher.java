@@ -25,6 +25,7 @@ public class Launcher {
                 .build();
 
         Twigritte twigritte = new Twigritte(configuration);
+        Runtime.getRuntime().addShutdownHook(new Thread(twigritte::stop));
         twigritte.start();
     }
 }
