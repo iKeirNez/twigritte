@@ -31,37 +31,41 @@ public class Twigritte {
         incomingWatcher.start();
 
         while (running) {
-            CompletableFuture<File> tweetFileFuture = incomingWatcher.watchFor(configuration.getTweetFileFilter())
-                    .whenComplete((tweetFile, throwable) -> {
-                        if (throwable == null) {
-                            LOG.info("Processing incoming tweet file: " + tweetFile.getAbsolutePath());
-                        } else {
-                            LOG.error("Error whilst processing incoming tweet file", throwable);
-                        }
-                    });
-
-            CompletableFuture<File> imageFileFuture = incomingWatcher.watchFor(configuration.getImageFileFilter())
-                    .whenComplete((imageFile, throwable) -> {
-                        if (throwable == null) {
-                            LOG.info("Processing incoming image file: " + imageFile.getAbsolutePath());
-                        } else {
-                            LOG.error("Error whilst processing incoming image file", throwable);
-                        }
-                    });
-
-            LOG.info("Ready for job!");
-            tweetComponentsFuture = CompletableFuture.allOf(tweetFileFuture, imageFileFuture);
-
-            try {
-                tweetComponentsFuture.join();
-            } catch (CancellationException e) {
-                if (running) {
-                    LOG.warn("Tweet components future was cancelled", e);
-                }
-            }
-
-            handleTweet(tweetFileFuture.join(), imageFileFuture.join());
+            getAndHandleJob();
         }
+    }
+
+    private void getAndHandleJob() {
+        CompletableFuture<File> tweetFileFuture = incomingWatcher.watchFor(configuration.getTweetFileFilter())
+                .whenComplete((tweetFile, throwable) -> {
+                    if (throwable == null) {
+                        LOG.info("Processing incoming tweet file: " + tweetFile.getAbsolutePath());
+                    } else {
+                        LOG.error("Error whilst processing incoming tweet file", throwable);
+                    }
+                });
+
+        CompletableFuture<File> imageFileFuture = incomingWatcher.watchFor(configuration.getImageFileFilter())
+                .whenComplete((imageFile, throwable) -> {
+                    if (throwable == null) {
+                        LOG.info("Processing incoming image file: " + imageFile.getAbsolutePath());
+                    } else {
+                        LOG.error("Error whilst processing incoming image file", throwable);
+                    }
+                });
+
+        LOG.info("Ready for job!");
+        tweetComponentsFuture = CompletableFuture.allOf(tweetFileFuture, imageFileFuture);
+
+        try {
+            tweetComponentsFuture.join();
+        } catch (CancellationException e) {
+            if (running) {
+                LOG.warn("Tweet components future was cancelled", e);
+            }
+        }
+
+        handleJob(tweetFileFuture.join(), imageFileFuture.join());
     }
 
     public void stop() {
@@ -73,8 +77,60 @@ public class Twigritte {
         }
     }
 
-    private void handleTweet(File tweetFile, File imageFile) {
-        LOG.debug("Handling tweet");
+    private void handleJob(File tweetFile, File imageFile) {
+        File targetImageFile = null;
+
+        try {
+            LOG.debug("Handling tweet");
+            targetImageFile = getTweetImage(imageFile);
+            String tweetText = getTweetText(tweetFile);
+
+            if (targetImageFile != null && tweetText != null) {
+                postTweet(tweetText, targetImageFile);
+            }
+        } finally {
+            postJobCleanup(tweetFile, imageFile, targetImageFile);
+        }
+    }
+
+    private void postTweet(String tweetText, File imageFile) {
+        Twitter twitter = TwitterFactory.getSingleton();
+        StatusUpdate statusUpdate = new StatusUpdate(tweetText);
+        statusUpdate.setMedia(imageFile);
+
+        try {
+            LOG.info("Posting tweet to account: " + twitter.getScreenName());
+            Status status = twitter.updateStatus(statusUpdate);
+            LOG.info("Tweet posted");
+            LOG.info("https://twitter.com/statuses/" + status.getId());
+        } catch (TwitterException e) {
+            LOG.error("Error whilst posting tweet", e);
+        }
+    }
+
+    private static String loadAsString(File tweetFile) throws IOException {
+        return new String(Files.readAllBytes(tweetFile.toPath()), Charset.forName("UTF-8"));
+    }
+
+    private String getTweetText(File tweetFile) {
+        String tweetText = null;
+
+        try {
+            tweetText = loadAsString(tweetFile);
+
+            if (!configuration.shouldKeepKyoTag()) {
+                tweetText = tweetText.replace("#kyocera", "")
+                        .replace("#kyocodes", "")
+                        .trim();
+            }
+        } catch (IOException e) {
+            LOG.error("Error during tweet text loading", e);
+        }
+
+        return tweetText;
+    }
+
+    private File getTweetImage(File imageFile) {
         File targetImage = imageFile;
         FileConverter imageConverter = configuration.getImageConverter();
 
@@ -84,61 +140,26 @@ public class Twigritte {
                 targetImage = imageConverter.convert(imageFile);
             } catch (IOException e) {
                 LOG.error("Error during image conversion", e);
-                return;
+                targetImage = null;
             }
         }
 
-        String tweetText;
+        return targetImage;
+    }
 
-        try {
-            tweetText = getTweetText(loadAsString(tweetFile));
-        } catch (IOException e) {
-            LOG.error("Unable to load tweet text", e);
-            return;
-        }
-
-        Twitter twitter = TwitterFactory.getSingleton();
-        StatusUpdate statusUpdate = new StatusUpdate(tweetText);
-        statusUpdate.setMedia(targetImage);
-
-        try {
-            LOG.info("Posting tweet to account: " + twitter.getScreenName());
-            Status status = twitter.updateStatus(statusUpdate);
-            LOG.info("Tweet posted");
-            LOG.info("https://twitter.com/statuses/" + status.getId());
-        } catch (TwitterException e) {
-            LOG.error("Error whilst posting tweet", e);
-            return;
-        }
-
+    private void postJobCleanup(File tweetFile, File originalImageFile, File targetImageFile) {
         LOG.info("Cleaning up job files");
         boolean tweetFileDeleted = tweetFile.delete();
-        boolean imageFileDeleted = imageFile.delete();
+        boolean imageFileDeleted = originalImageFile.delete();
         boolean convertedFileDeleted = false;
 
         // is converted image
-        if (!targetImage.equals(imageFile)) {
-             convertedFileDeleted = targetImage.delete();
+        if (targetImageFile != null && !targetImageFile.equals(originalImageFile)) {
+            convertedFileDeleted = targetImageFile.delete();
         }
 
         LOG.debug("Tweet file deleted: " + tweetFileDeleted);
         LOG.debug("Image file deleted: " + imageFileDeleted);
         LOG.debug("Converted file deleted: " + convertedFileDeleted);
-    }
-
-    private String getTweetText(String rawTweetText) {
-        String tweetText = rawTweetText;
-
-        if (!configuration.shouldKeepKyoTag()) {
-            tweetText = tweetText.replace("#kyocera", "")
-                    .replace("#kyocodes", "")
-                    .trim();
-        }
-
-        return tweetText;
-    }
-
-    private static String loadAsString(File tweetFile) throws IOException {
-        return new String(Files.readAllBytes(tweetFile.toPath()), Charset.forName("UTF-8"));
     }
 }
