@@ -33,7 +33,7 @@ public class PdfToJpgConverter implements FileConverter {
 
                 int page = 0; // just convert the first page
                 LOG.info("Rendering PDF as image (JPG), this may take awhile...");
-                BufferedImage bufferedImage = renderer.renderImage(page);
+                BufferedImage bufferedImage = renderer.renderImageWithDPI(page, 300);
                 File outputFile = new File(file.getParentFile(), baseFileName + "-converted-" + page + ".jpg");
                 LOG.debug("Converted file: " + outputFile.toString());
                 ImageIO.write(bufferedImage, "jpg", outputFile);
