@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
 public class Twigritte {
@@ -17,6 +18,8 @@ public class Twigritte {
 
     private final Configuration configuration;
     private final IncomingFileWatcher incomingWatcher;
+    private boolean running;
+    private CompletableFuture<Void> tweetComponentsFuture = null;
 
     public Twigritte(Configuration configuration) {
         this.configuration = configuration;
@@ -24,33 +27,50 @@ public class Twigritte {
     }
 
     public void start() {
+        running = true;
         incomingWatcher.start();
 
-        CompletableFuture<File> tweetFileFuture = incomingWatcher.watchFor(configuration.getTweetFileFilter())
-                .whenComplete((tweetFile, throwable) -> {
-                    if (throwable == null) {
-                        LOG.info("Processing incoming tweet file: " + tweetFile.getAbsolutePath());
-                    } else {
-                        LOG.error("Error whilst processing incoming tweet file", throwable);
-                    }
-                });
+        while (running) {
+            CompletableFuture<File> tweetFileFuture = incomingWatcher.watchFor(configuration.getTweetFileFilter())
+                    .whenComplete((tweetFile, throwable) -> {
+                        if (throwable == null) {
+                            LOG.info("Processing incoming tweet file: " + tweetFile.getAbsolutePath());
+                        } else {
+                            LOG.error("Error whilst processing incoming tweet file", throwable);
+                        }
+                    });
 
-        CompletableFuture<File> imageFileFuture = incomingWatcher.watchFor(configuration.getImageFileFilter())
-                .whenComplete((imageFile, throwable) -> {
-                    if (throwable == null) {
-                        LOG.info("Processing incoming image file: " + imageFile.getAbsolutePath());
-                    } else {
-                        LOG.error("Error whilst processing incoming image file", throwable);
-                    }
-                });
+            CompletableFuture<File> imageFileFuture = incomingWatcher.watchFor(configuration.getImageFileFilter())
+                    .whenComplete((imageFile, throwable) -> {
+                        if (throwable == null) {
+                            LOG.info("Processing incoming image file: " + imageFile.getAbsolutePath());
+                        } else {
+                            LOG.error("Error whilst processing incoming image file", throwable);
+                        }
+                    });
 
-        CompletableFuture.allOf(tweetFileFuture, imageFileFuture).whenComplete((aVoid, throwable) -> {
-            if (throwable == null) {
-                handleTweet(tweetFileFuture.join(), imageFileFuture.join());
-            } else {
-                LOG.error("Error whilst processing incoming files", throwable);
+            LOG.info("Ready for next job!");
+            tweetComponentsFuture = CompletableFuture.allOf(tweetFileFuture, imageFileFuture);
+
+            try {
+                tweetComponentsFuture.join();
+            } catch (CancellationException e) {
+                if (running) {
+                    LOG.warn("Tweet components future was cancelled", e);
+                }
             }
-        });
+
+            handleTweet(tweetFileFuture.join(), imageFileFuture.join());
+        }
+    }
+
+    public void stop() {
+        running = false;
+        incomingWatcher.stop();
+
+        if (tweetComponentsFuture != null) {
+            tweetComponentsFuture.cancel(false);
+        }
     }
 
     private void handleTweet(File tweetFile, File imageFile) {
