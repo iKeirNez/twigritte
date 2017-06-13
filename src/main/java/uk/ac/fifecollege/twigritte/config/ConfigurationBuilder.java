@@ -1,5 +1,7 @@
 package uk.ac.fifecollege.twigritte.config;
 
+import uk.ac.fifecollege.twigritte.conversion.FileConverter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +46,11 @@ public class ConfigurationBuilder {
 
     public ConfigurationBuilder withImageFileFilter(FileFilter filter) {
         instance.imageFileFilter = filter;
+        return this;
+    }
+
+    public ConfigurationBuilder withImageConverter(FileConverter imageConverter) {
+        instance.imageConverter = imageConverter;
         return this;
     }
 

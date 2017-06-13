@@ -1,5 +1,7 @@
 package uk.ac.fifecollege.twigritte.config;
 
+import uk.ac.fifecollege.twigritte.conversion.FileConverter;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.Objects;
@@ -11,16 +13,19 @@ public class Configuration {
     protected long pollTime = 5;
     protected FileFilter tweetFileFilter = null;
     protected FileFilter imageFileFilter = null;
+    protected FileConverter imageConverter = null;
     protected boolean keepKyoTag = true;
 
     protected Configuration() {}
 
-    public Configuration(File pollDirectory, TimeUnit pollTimeUnit, long pollTime, FileFilter tweetFileFilter, FileFilter imageFileFilter, boolean keepKyoTag) {
+    public Configuration(File pollDirectory, TimeUnit pollTimeUnit, long pollTime, FileFilter tweetFileFilter,
+                         FileFilter imageFileFilter, FileConverter imageConverter, boolean keepKyoTag) {
         this.pollDirectory = pollDirectory;
         this.pollTimeUnit = pollTimeUnit;
         this.pollTime = pollTime;
         this.tweetFileFilter = tweetFileFilter;
         this.imageFileFilter = imageFileFilter;
+        this.imageConverter = imageConverter;
         this.keepKyoTag = keepKyoTag;
     }
 
@@ -62,6 +67,14 @@ public class Configuration {
 
     public void setImageFileFilter(FileFilter imageFileFilter) {
         this.imageFileFilter = imageFileFilter;
+    }
+
+    public FileConverter getImageConverter() {
+        return imageConverter;
+    }
+
+    public void setImageConverter(FileConverter imageConverter) {
+        this.imageConverter = imageConverter;
     }
 
     public boolean isKeepKyoTag() {
