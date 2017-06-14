@@ -26,6 +26,7 @@ public class Launcher {
                     .withTweetFileFilter(TWEET_FILE_FILTER)
                     .withImageFileFilter(IMAGE_FILE_FILTER)
                     .withImageConverter(new PdfToJpgConverter())
+                    .withTweetSuffix(" #scantosocial")
                     .build();
 
             LOG.info("Configuration: " + configuration);

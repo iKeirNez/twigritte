@@ -116,12 +116,31 @@ public class Twigritte {
         String tweetText = null;
 
         try {
-            tweetText = loadAsString(tweetFile);
+            tweetText = loadAsString(tweetFile).trim();
 
             if (!configuration.shouldKeepKyoTag()) {
                 tweetText = tweetText.replace("#kyocera", "")
                         .replace("#kyocodes", "")
                         .trim();
+            }
+
+            int maxTweetLength = 118;
+
+            String tweetSuffix = configuration.getTweetSuffix();
+            if (tweetSuffix != null) {
+                maxTweetLength -= tweetSuffix.length();
+            }
+
+            if (tweetText.length() > maxTweetLength) {
+                String cutIndicator = "...";
+                maxTweetLength -= cutIndicator.length();
+
+                String trimmedTweetText = tweetText.substring(0, maxTweetLength);
+                tweetText = trimmedTweetText + cutIndicator;
+            }
+
+            if (tweetSuffix != null) {
+                tweetText += tweetSuffix;
             }
         } catch (IOException e) {
             LOG.error("Error during tweet text loading", e);

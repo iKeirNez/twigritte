@@ -12,6 +12,7 @@ public class Configuration {
     protected FileFilter imageFileFilter = null;
     protected FileConverter imageConverter = null;
     protected boolean keepKyoTag = true;
+    protected String tweetSuffix = null;
 
     protected Configuration() {}
 
@@ -64,6 +65,14 @@ public class Configuration {
         this.keepKyoTag = keepKyoTag;
     }
 
+    public String getTweetSuffix() {
+        return tweetSuffix;
+    }
+
+    public void setTweetSuffix(String tweetSuffix) {
+        this.tweetSuffix = tweetSuffix;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -73,12 +82,13 @@ public class Configuration {
                 Objects.equals(watchDirectory, that.watchDirectory) &&
                 Objects.equals(tweetFileFilter, that.tweetFileFilter) &&
                 Objects.equals(imageFileFilter, that.imageFileFilter) &&
-                Objects.equals(imageConverter, that.imageConverter);
+                Objects.equals(imageConverter, that.imageConverter) &&
+                Objects.equals(tweetSuffix, that.tweetSuffix);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(watchDirectory, tweetFileFilter, imageFileFilter, imageConverter, keepKyoTag);
+        return Objects.hash(watchDirectory, tweetFileFilter, imageFileFilter, imageConverter, keepKyoTag, tweetSuffix);
     }
 
     @Override
@@ -89,6 +99,7 @@ public class Configuration {
                 ", imageFileFilter=" + imageFileFilter +
                 ", imageConverter=" + imageConverter +
                 ", keepKyoTag=" + keepKyoTag +
+                ", tweetSuffix='" + tweetSuffix + '\'' +
                 '}';
     }
 }

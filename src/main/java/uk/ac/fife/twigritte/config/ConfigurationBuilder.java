@@ -47,6 +47,11 @@ public class ConfigurationBuilder {
         return this;
     }
 
+    public ConfigurationBuilder withTweetSuffix(String suffix) {
+        instance.tweetSuffix = suffix;
+        return this;
+    }
+
     public ConfigurationBuilder removeKyoTag() {
         instance.keepKyoTag = false;
         return this;
