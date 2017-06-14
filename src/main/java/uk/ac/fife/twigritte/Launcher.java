@@ -26,7 +26,6 @@ public class Launcher {
                     .withTweetFileFilter(TWEET_FILE_FILTER)
                     .withImageFileFilter(IMAGE_FILE_FILTER)
                     .withImageConverter(new PdfToJpgConverter())
-                    .removeKyoTag() // TODO remove this for competition
                     .build();
 
             LOG.info("Configuration: " + configuration);
