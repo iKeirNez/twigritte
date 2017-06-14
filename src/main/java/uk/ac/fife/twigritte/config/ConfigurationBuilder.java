@@ -52,11 +52,6 @@ public class ConfigurationBuilder {
         return this;
     }
 
-    public ConfigurationBuilder removeKyoTag() {
-        instance.keepKyoTag = false;
-        return this;
-    }
-
     public Configuration build() {
         // TODO prevent this being called more than once per instance
 

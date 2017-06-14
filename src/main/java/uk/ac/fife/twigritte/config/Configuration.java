@@ -11,7 +11,6 @@ public class Configuration {
     protected FileFilter tweetFileFilter = null;
     protected FileFilter imageFileFilter = null;
     protected FileConverter imageConverter = null;
-    protected boolean keepKyoTag = true;
     protected String tweetSuffix = null;
 
     protected Configuration() {}
@@ -22,7 +21,6 @@ public class Configuration {
         this.tweetFileFilter = tweetFileFilter;
         this.imageFileFilter = imageFileFilter;
         this.imageConverter = imageConverter;
-        this.keepKyoTag = keepKyoTag;
     }
 
     public File getWatchDirectory() {
@@ -57,14 +55,6 @@ public class Configuration {
         this.imageConverter = imageConverter;
     }
 
-    public boolean shouldKeepKyoTag() {
-        return keepKyoTag;
-    }
-
-    public void setKeepKyoTag(boolean keepKyoTag) {
-        this.keepKyoTag = keepKyoTag;
-    }
-
     public String getTweetSuffix() {
         return tweetSuffix;
     }
@@ -78,8 +68,7 @@ public class Configuration {
         if (this == o) return true;
         if (!(o instanceof Configuration)) return false;
         Configuration that = (Configuration) o;
-        return keepKyoTag == that.keepKyoTag &&
-                Objects.equals(watchDirectory, that.watchDirectory) &&
+        return Objects.equals(watchDirectory, that.watchDirectory) &&
                 Objects.equals(tweetFileFilter, that.tweetFileFilter) &&
                 Objects.equals(imageFileFilter, that.imageFileFilter) &&
                 Objects.equals(imageConverter, that.imageConverter) &&
@@ -88,7 +77,7 @@ public class Configuration {
 
     @Override
     public int hashCode() {
-        return Objects.hash(watchDirectory, tweetFileFilter, imageFileFilter, imageConverter, keepKyoTag, tweetSuffix);
+        return Objects.hash(watchDirectory, tweetFileFilter, imageFileFilter, imageConverter, tweetSuffix);
     }
 
     @Override
@@ -98,7 +87,6 @@ public class Configuration {
                 ", tweetFileFilter=" + tweetFileFilter +
                 ", imageFileFilter=" + imageFileFilter +
                 ", imageConverter=" + imageConverter +
-                ", keepKyoTag=" + keepKyoTag +
                 ", tweetSuffix='" + tweetSuffix + '\'' +
                 '}';
     }

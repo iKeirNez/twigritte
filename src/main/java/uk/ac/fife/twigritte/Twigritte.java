@@ -116,15 +116,8 @@ public class Twigritte {
         String tweetText = null;
 
         try {
-            tweetText = loadAsString(tweetFile).trim();
-
-            if (!configuration.shouldKeepKyoTag()) {
-                tweetText = tweetText.replace("#kyocera", "")
-                        .replace("#kyocodes", "")
-                        .trim();
-            }
-
             int maxTweetLength = 118;
+            tweetText = loadAsString(tweetFile).trim();
 
             String tweetSuffix = configuration.getTweetSuffix();
             if (tweetSuffix != null) {
