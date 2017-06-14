@@ -43,4 +43,9 @@ public class PdfToJpgConverter implements FileConverter {
 
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "PdfToJpgConverter{}";
+    }
 }
