@@ -28,10 +28,46 @@ public class Twigritte {
 
     public void start() {
         running = true;
+
+        LOG.info("Performing startup job check");
+        manualCheckAndHandleJob();
         incomingWatcher.start();
 
         while (running) {
             getAndHandleJob();
+        }
+    }
+
+    private void manualCheckAndHandleJob() {
+        LOG.info("Manually checking for jobs");
+        File watchDirectory = configuration.getWatchDirectory();
+        File[] tweetFiles = watchDirectory.listFiles(configuration.getTweetFileFilter());
+        File[] imageFiles = watchDirectory.listFiles(configuration.getImageFileFilter());
+        File tweetFile = null;
+        File imageFile = null;
+
+        if (tweetFiles != null && tweetFiles.length > 0) {
+            if (tweetFiles.length > 1) {
+                LOG.warn("Multiple files match tweet file filter");
+            }
+
+            tweetFile = tweetFiles[0];
+        }
+
+        if (imageFiles != null && imageFiles.length > 0) {
+            if (imageFiles.length > 1) {
+                LOG.warn("Multiple files match image file filter");
+            }
+
+            imageFile = imageFiles[0];
+        }
+
+        // check if tweet and image files exist
+        if (tweetFile != null && imageFile != null) {
+            LOG.info("Found job");
+            handleJob(tweetFile, imageFile);
+        } else {
+            LOG.info("No jobs found during manual check");
         }
     }
 
@@ -89,7 +125,7 @@ public class Twigritte {
                 postTweet(tweetText, targetImageFile);
             }
         } finally {
-            postJobCleanup(tweetFile, imageFile, targetImageFile);
+            cleanupJobFiles(tweetFile, imageFile, targetImageFile);
         }
     }
 
@@ -159,7 +195,7 @@ public class Twigritte {
         return targetImage;
     }
 
-    private void postJobCleanup(File tweetFile, File originalImageFile, File targetImageFile) {
+    private void cleanupJobFiles(File tweetFile, File originalImageFile, File targetImageFile) {
         LOG.info("Cleaning up job files");
         boolean tweetFileDeleted = tweetFile.delete();
         boolean imageFileDeleted = originalImageFile.delete();
